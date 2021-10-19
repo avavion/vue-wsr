@@ -1,49 +1,49 @@
-const App = {
+const App = Vue.createApp({
     data() {
         return {
             placeholder: "Введите наименование заметки",
             title: "Список заметок",
             inputValue: "",
-            notes: [
-                {id: 1, title: "Наименование", body: "Тело"},
-                {id: 2, title: "Наименование", body: "Тело"},
-                {id: 3, title: "Наименование", body: "Тело"},
-                {id: 4, title: "Наименование", body: "Тело"},
-                {id: 5, title: "Наименование", body: "Тело"},
-                {id: 6, title: "Наименование", body: "Тело"},
-                {id: 7, title: "Наименование", body: "Тело"},
-                {id: 8, title: "Наименование", body: "Тело"},
-            ]
+            notes: []
         }
+    },
+    created() {
+        if (localStorage.getItem("notes") === null) {
+            localStorage.setItem('notes', JSON.stringify([]));
+        }
+
+        this.notes = JSON.parse(localStorage.getItem("notes"));
     },
     methods: {
         inputChangeHandler(e) {
             this.inputValue = e.target.value;
         },
-        addNoteHandler(e) {
+        addNoteHandler() {
             if (this.inputValue === '') {
                 return false;
             }
 
             const note = {
-                id: this.notes.length + 1,
-                body: "Эта заметка добавлена с помощью Vue",
+                id: Date.now(),
                 title: this.inputValue
             }
 
             this.notes.push(note);
+
+            localStorage.setItem('notes', JSON.stringify(this.notes));
+
             this.inputValue = "";
         },
         removeNoteHandler(id) {
             this.notes = this.notes.filter((note) => note.id !== id);
+            localStorage.setItem("notes", JSON.stringify(this.notes));
         }
     },
     computed: {
         doubleCountComputed() {
-            console.log("doubleCountComputed");
             return (this.notes.length + 1) * 2;
         }
     }
-};
+});
 
-Vue.createApp(App).mount('#app');
+const app = App.mount('#app');
